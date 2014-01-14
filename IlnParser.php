@@ -74,7 +74,7 @@ class IlnParser extends PorterAbstraction
                 
             $this->file = file($file);
         } catch (\RuntimeException $ex) {
-            $ex->getMessage();  
+            $ex->getMessage();
         }
         
         return $this;

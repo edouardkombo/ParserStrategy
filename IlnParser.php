@@ -37,9 +37,9 @@ class IlnParser extends PorterAbstraction
 
     /**
      *
-     * @var array $container
+     * @var stdClass $container
      */
-    protected $container;
+    public $container;
 
     /**
      * Constructor
@@ -74,7 +74,7 @@ class IlnParser extends PorterAbstraction
                 
             $this->file = file($file);
         } catch (\RuntimeException $ex) {
-
+            $ex->getMessage();  
         }
         
         return $this;

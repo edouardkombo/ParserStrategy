@@ -39,13 +39,14 @@ class IlnParser extends PorterAbstraction
      *
      * @var array $container
      */
-    protected $container = array();
+    protected $container;
 
     /**
      * Constructor
      */
     public function __construct()
     {
+        $this->container = new \stdClass();
     }
     
     /**
@@ -64,22 +65,30 @@ class IlnParser extends PorterAbstraction
      * 
      * @return \TTI\ParserStrategy\IlnParser
      */
-    public function open($file)
+    public function open($file = null)
     {
-        $this->file = file($file);
+        try {
+            if (!file_exists($file)) {
+                throw new \RuntimeException("$file doesn't exists!");
+            }
+                
+            $this->file = file($file);
+        } catch (\RuntimeException $ex) {
+
+        }
         
         return $this;
     }
     
     /**
-     * Escape comments
+     * Escape comments and empty lines
      * 
      * @return \TTI\ParserStrategy\IlnParser
      */
     public function escape()
     {
         foreach ($this->file as $line_num => $line) {
-            if (substr($line, 0, 1) == '#') {
+            if ((substr($line, 0, 1) == '#') OR (strlen($line) == 1)) {
                 unset($this->file[$line_num]);
             }
         }
@@ -94,42 +103,33 @@ class IlnParser extends PorterAbstraction
      */
     public function parse()
     {
-        foreach ($this->file as $line_num => $line) {
-            if (empty($line)) {
-                continue;    
-            }
-            
+        $driver = '';
+        $method = '';
+        
+        foreach ($this->file as $line) {
+            $separator = \explode(':', trim($line));            
+          
             if (substr($line, 0, 1) != ' ') {
-                $driver = \explode(':', trim($line));
-                $this->container[$driver[0]] = new stdClass();
-                $this->container = $this->container[$driver[0]];
-                $this->container->namespace = $driver[1];
+                $driver = $separator[0];
+                $this->container->driver[$driver] = new \stdClass();
+                $this->container->driver[$driver]->namespace = trim($separator[1]);
                 continue;
             }
             
-            if (substr($line, 0, 4) == '    ' && substr($line, 4, 1) != '') {
-                $method = \explode(':', trim($line));
-                $this->container->method = array($method[0], 0);
+            if (substr($line, 0, 4) == '    ' && substr($line, 4, 1) != ' ') {
+                $method = trim($separator[0]);
+                $this->container->driver[$driver]->method[$method] = array();
                 continue;
             }
-            
+
             if (substr($line, 0, 8) == '        ' && substr($line, 8, 1) != '') {
-                $arg = \explode(':', trim($line));
-                $this->container->method[1][] = array($arg[0], $arg[1]);
+                $arg = trim($separator[0]);
+                $val = trim($separator[1]);
+                $this->container->driver[$driver]->method[$method][$arg] = $val;
                 continue;
             }            
         }
         
         return $this;
-    }     
-
-    /**
-     * Close something
-     *
-     * @return mixed final
-     */
-    public function close()
-    {
-        
-    }   
+    }
 }

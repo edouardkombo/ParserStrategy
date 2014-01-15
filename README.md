@@ -6,7 +6,7 @@ The Troll Inception - Parser Strategy
 About
 -----
 
-Parser Strategy is a parser for ILN (Intuitive Language Notation) files.
+Parser Strategy is a parser for ILN (Intuitive Language Notation) files. It helps managing services and events.
 
 Requirements
 ------------

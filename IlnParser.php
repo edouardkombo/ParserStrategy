@@ -112,8 +112,9 @@ class IlnParser extends PorterAbstraction
           
             if (substr($line, 0, 1) != ' ') {
                 $driver = $separator[0];
+                $namespace = (isset($separator[1])) ? trim($separator[1]) : '';
                 $this->container->driver[$driver] = new \stdClass();
-                $this->container->driver[$driver]->namespace = trim($separator[1]);
+                $this->container->driver[$driver]->namespace = $namespace;
                 continue;
             }
             
